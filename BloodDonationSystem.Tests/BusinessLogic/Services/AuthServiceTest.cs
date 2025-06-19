@@ -46,6 +46,21 @@ namespace BloodDonationSystem.Tests.Services
 
 
         [Test]
+        public async Task LoginAsync_UserRoleIsEmpty_ThrowsInvalidOperationException()
+        {
+            var user = new User { email = "string@ex.com", role = "", name = "abc" };
+            _userRepoMock.Setup(r => r.GetUserByEmailAsync(user.email)).ReturnsAsync(user);
+
+            var ex = await Task.Run(() => Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                await _authService.LoginAsync(user.email, "string");
+            }));
+
+            Assert.That(ex?.Message, Is.EqualTo("User role is missing."));
+        }
+
+
+        [Test]
         public async Task RegisterAsync_EmailExists_ReturnsFalse()
         {
             var user = new User { email = "exists@example.com", name = "abc" };
